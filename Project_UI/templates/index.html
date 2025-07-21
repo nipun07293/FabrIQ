@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion Store - Filter & Shop</title>
+    <style>
+        :root {
+            --primary-text: #282c3f;
+            --secondary-text: #535766;
+            --accent-color: #ff3f6c;
+            --background-color: #f5f5f6;
+            --border-color: #d4d5d9;
+            --card-background: #ffffff;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--primary-text);
+        }
+
+        .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
+
+        .header {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            padding: 20px 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            /* --- MODIFICATION START --- */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            /* --- MODIFICATION END --- */
+        }
+        .header h1 { font-size: 2.2em; font-weight: 700; }
+        .header p { color: var(--secondary-text); font-size: 1.1em; margin-top: 5px; }
+
+        /* --- NEW STYLE FOR THE BUTTON --- */
+        .header .nav-button {
+            background-color: var(--primary-text);
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+            white-space: nowrap;
+        }
+        .header .nav-button:hover {
+            background-color: var(--secondary-text);
+        }
+        /* --- END OF NEW STYLE --- */
+
+        /* Recommender Section Styles */
+        .recommender-section {
+            margin-bottom: 25px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+        .recommender-section h2 { font-size: 1.5em; margin-bottom: 15px; }
+        .search-container { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        
+        #textSearchContainer { flex-grow: 1; display: flex; min-width: 250px; }
+        #searchInput {
+            flex-grow: 1;
+            font-size: 1em;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px 0 0 8px;
+            border-right: none;
+        }
+        #searchButton {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0 25px;
+            font-size: 1em;
+            font-weight: 600;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #searchButton:hover { background-color: #d6335a; }
+
+        #uploadContainer { display: flex; align-items: center; gap: 10px; }
+        .upload-btn-wrapper { position: relative; overflow: hidden; display: inline-block; }
+        .btn-upload {
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            background-color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-upload:hover { background-color: #fff8f9; }
+        .upload-btn-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        #imagePreviewContainer { display: none; align-items: center; gap: 10px; }
+        #imagePreview { max-height: 44px; max-width: 44px; border-radius: 4px; border: 1px solid #ddd; object-fit: cover; }
+        #cancelUploadBtn { font-size: 24px; cursor: pointer; color: var(--secondary-text); line-height: 1; padding-bottom: 4px; }
+        #cancelUploadBtn:hover { color: var(--primary-text); }
+
+        .loading, .error { text-align: center; padding: 50px; font-size: 1.2em; color: var(--secondary-text); }
+        .error { color: #d32f2f; background-color: #ffebee; border: 1px solid #d32f2f; border-radius: 8px; }
+        
+        .main-content { display: grid; grid-template-columns: 280px 1fr; gap: 25px; }
+        .filters-panel { background-color: var(--card-background); border-radius: 8px; padding: 20px; height: fit-content; position: sticky; top: 20px; border: 1px solid #f0f0f0; }
+        .filter-section { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #f0f0f0; }
+        .filter-section:last-of-type { border-bottom: none; margin-bottom: 0; }
+        .filter-title { font-size: 1.1em; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .filter-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .filter-chip { background-color: #fff; border: 1px solid var(--border-color); border-radius: 20px; padding: 8px 14px; font-size: 0.9em; cursor: pointer; transition: all 0.2s ease; color: var(--primary-text); }
+        .filter-chip:hover { border-color: var(--accent-color); color: var(--accent-color); }
+        .filter-chip.active { background-color: var(--accent-color); color: white; border-color: var(--accent-color); font-weight: 600; }
+        .clear-filters { background-color: #fff; color: var(--accent-color); border: 1px solid var(--accent-color); border-radius: 8px; padding: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; width: 100%; margin-top: 20px; font-size: 1em; }
+        .clear-filters:hover { background-color: var(--accent-color); color: white; }
+        
+        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .results-count { padding: 15px; font-weight: 600; background-color: var(--card-background); border-radius: 8px; flex-grow: 1; }
+        #backToAll { background-color: #535766; color: white; border: none; padding: 12px 20px; font-size: 0.9em; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; display: none; }
+        
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; }
+        .product-card { background: var(--card-background); border-radius: 8px; overflow: hidden; transition: all 0.3s ease; border: 1px solid transparent; animation: fadeIn 0.5s ease-out forwards; display: flex; flex-direction: column; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); border-color: #eaeaec; }
+        .product-image-container { position: relative; }
+        .product-image { width: 100%; height: 320px; object-fit: cover; background-color: #f0f0f0; }
+        .product-info { padding: 15px; flex-grow: 1; }
+        .product-brand { font-weight: 700; font-size: 1.1em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-name { color: var(--secondary-text); font-size: 1em; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-primary-detail { font-weight: 500; margin-top: 10px; font-size: 0.9em; }
+        .product-extra-details { margin-top: 8px; font-size: 0.85em; color: var(--secondary-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-actions { padding: 0 15px 15px; }
+        .similar-btn { width: 100%; background-color: transparent; border: 1px solid var(--primary-text); color: var(--primary-text); padding: 10px; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; }
+        .similar-btn:hover { background-color: var(--primary-text); color: white; }
+        .no-results { text-align: center; padding: 60px 20px; color: var(--secondary-text); grid-column: 1 / -1; }
+        .no-results::before { content: '😕'; display: block; font-size: 3em; margin-bottom: 15px; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (max-width: 900px) {
+            .main-content { grid-template-columns: 1fr; }
+            .filters-panel { position: static; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div>
+                <h1>Fashion Discovery</h1>
+                <p>Find your next favorite outfit with precision filters or our smart recommender</p>
+            </div>
+            <a href="/style-transfer" class="nav-button">Try AI Style Transfer ✨</a>
+            </header>
+
+        <section class="recommender-section">
+            <h2>Find Similar Styles</h2>
+            <div class="search-container">
+                <div id="textSearchContainer">
+                    <input type="text" id="searchInput" placeholder="e.g., 'blue floral dress'">
+                    <button id="searchButton">Search</button>
+                </div>
+                
+                <span style="color: #ccc;">OR</span>
+
+                <div id="uploadContainer">
+                    <div class="upload-btn-wrapper">
+                        <button class="btn-upload">Upload Image</button>
+                        <input type="file" id="imageUploadInput" name="imagefile" accept="image/*">
+                    </div>
+                    <div id="imagePreviewContainer">
+                        <img id="imagePreview" src="" alt="Image Preview"/>
+                        <span id="cancelUploadBtn" title="Remove image">&times;</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <div id="loadingIndicator" class="loading">✨ Loading fresh styles for you...</div>
+        
+        <div class="main-content" id="mainContent" style="display: none;">
+            <aside class="filters-panel">
+                <div class="filter-section">
+                    <div class="filter-title">Category</div>
+                    <div class="filter-group" id="categoryFilters"></div>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-title">Item</div>
+                    <div class="filter-group" id="itemFilters"></div>
+                </div>
+                 <div class="filter-section">
+                    <div class="filter-title">Brand</div>
+                    <div class="filter-group" id="brandFilters"></div>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-title">Color</div>
+                    <div class="filter-group" id="looksFilters"></div>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-title">Pattern</div>
+                    <div class="filter-group" id="colorsFilters"></div>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-title">Material</div>
+                    <div class="filter-group" id="materialFilters"></div>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-title">Sleeve Style</div>
+                    <div class="filter-group" id="sleeveFilters"></div>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-title">Neck Line</div>
+                    <div class="filter-group" id="neckFilters"></div>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-title">Fit</div>
+                    <div class="filter-group" id="fitFilters"></div>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-title">Length</div>
+                    <div class="filter-group" id="lengthFilters"></div>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-title">Texture</div>
+                    <div class="filter-group" id="texturesFilters"></div>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-title">Shape</div>
+                    <div class="filter-group" id="shapeFilters"></div>
+                </div>
+                <button class="clear-filters" id="clearFiltersBtn">Clear All Filters</button>
+            </aside>
+            
+            <main class="products-section">
+                <div class="results-header">
+                    <div id="resultsCount" class="results-count"></div>
+                    <button id="backToAll">← Back to All Products</button>
+                </div>
+                <div id="productsGrid" class="products-grid"></div>
+            </main>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

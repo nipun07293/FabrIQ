@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neural Style Transfer</title>
+    <style>
+        :root {
+            --primary-text: #282c3f; --secondary-text: #535766; --accent-color: #ff3f6c;
+            --background-color: #f5f5f6; --border-color: #d4d5d9; --card-background: #ffffff;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body { font-family: var(--font-family); background-color: var(--background-color); color: var(--primary-text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 1200px; }
+        .header { background-color: var(--card-background); border-radius: 8px; padding: 20px 30px; margin-bottom: 25px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); text-align: center; }
+        .header h1 { font-size: 2.2em; font-weight: 700; }
+        .header p { color: var(--secondary-text); font-size: 1.1em; margin-top: 5px; }
+        .nav-link { display: inline-block; margin-top: 15px; color: var(--accent-color); text-decoration: none; font-weight: 600; }
+        .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+        .upload-section { display: flex; flex-direction: column; align-items: center; }
+        .upload-box { width: 100%; height: 300px; border: 2px dashed var(--border-color); border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: background-color 0.2s; position: relative; }
+        .upload-box:hover { background-color: #fafafa; }
+        .upload-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .upload-box span { color: var(--secondary-text); }
+        .upload-box input { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .controls { text-align: center; margin-top: 20px; grid-column: 1 / -1; }
+        .btn { background-color: var(--accent-color); color: white; border: none; padding: 15px 40px; font-size: 1.1em; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; }
+        .btn:disabled { background-color: #ccc; cursor: not-allowed; }
+        .results-section { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid var(--border-color); border-radius: 8px; min-height: 400px; }
+        .results-section img { max-width: 100%; max-height: 500px; border-radius: 8px; }
+        .status-box { text-align: center; }
+        .loader { border: 5px solid #f3f3f3; border-radius: 50%; border-top: 5px solid var(--accent-color); width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #statusMessage { font-weight: 600; color: var(--secondary-text); }
+        #errorMessage { color: #d32f2f; font-weight: 600; margin-top: 10px; }
+        @media (max-width: 800px) { .main-content { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Neural Style Transfer</h1>
+            <p>Apply any artistic style to your clothing</p>
+            <a href="/" class="nav-link">← Back to Product Store</a>
+        </header>
+
+        <form id="style-form" class="main-content">
+            <div class="upload-section">
+                <h2>1. Upload Your Clothing</h2>
+                <div class="upload-box" id="content-upload-box">
+                    <img src="" alt="Content Preview" id="content-preview" style="display:none;">
+                    <span id="content-text">Click or drag image here</span>
+                    <input type="file" id="content-input" accept="image/*" required>
+                </div>
+            </div>
+            <div class="upload-section">
+                <h2>2. Upload a Style Image</h2>
+                <div class="upload-box" id="style-upload-box">
+                    <img src="" alt="Style Preview" id="style-preview" style="display:none;">
+                    <span id="style-text">Click or drag image here</span>
+                    <input type="file" id="style-input" accept="image/*" required>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button type="submit" class="btn" id="start-btn" disabled>Start Styling</button>
+            </div>
+        </form>
+
+        <div id="results-container" class="main-content" style="margin-top: 30px; display:none;">
+            <div class="results-section" style="grid-column: 1 / -1;">
+                <div id="status-box">
+                    <div class="loader"></div>
+                    <p id="statusMessage">Processing your request...</p>
+                    <p id="errorMessage" style="display:none;"></p>
+                </div>
+                <img src="" alt="Stylized Result" id="result-image" style="display:none;">
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/style_transfer.js"></script>
+</body>
+</html>
